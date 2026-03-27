@@ -1,3 +1,23 @@
-import numpy as np
+!pip install kagglehub -q
+import kagglehub
 import pandas as pd
-#看到没有
+import numpy as np
+import os
+
+# Download dataset
+path = kagglehub.dataset_download("rabieelkharoua/predict-online-gaming-behavior-dataset")
+csv_file = [f for f in os.listdir(path) if f.endswith('.csv')][0]
+data = pd.read_csv(os.path.join(path, csv_file))
+data
+
+data.describe()
+data.isna().sum() #any missing value, show 0
+data.duplicated().sum()  #any duplicated value, show 0
+
+data["Gender_01"] = data["Gender"].map({"Male":0, "Female":1})
+data["GameDifficulty_012"] = data["GameDifficulty"].map({"Easy":0, "Medium":1, "Hard":2})
+data["EngagementLevel_012"] = data["EngagementLevel"].map({"Easy":0, "Medium":1, "High":2})
+data["Location1_123"] = data["Location"].astype("category").cat.codes
+data["GameGenre_123"] = data["GameGenre"].astype("category").cat.codes
+
+
