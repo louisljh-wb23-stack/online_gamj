@@ -12,3 +12,75 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 # Hyperparameter tuning
 from sklearn.model_selection import GridSearchCV
+
+# Replace 'online_gaming.csv' with your dataset filename
+data = pd.read_csv('online_gaming.csv')
+
+# See first 5 rows
+print(data.head())
+
+# 1. Handle missing values
+data.fillna({
+    'age': data['age'].median(),
+    'gender': 'Unknown',
+    'play_time_hours': data['play_time_hours'].median(),
+    'sessions_per_week': data['sessions_per_week'].median(),
+    'in_game_purchases': 0,
+    'level': data['level'].median(),
+    'days_since_last_login': data['days_since_last_login'].median()
+}, inplace=True)
+
+# 2. Encode categorical variables (gender)
+le = LabelEncoder()
+data['gender'] = le.fit_transform(data['gender'])
+
+# 3. Features and target
+X = data[['age', 'gender', 'play_time_hours', 'sessions_per_week',
+          'in_game_purchases', 'level', 'days_since_last_login']]
+y = data['churn']  # 1 = churn, 0 = active
+
+# 4. Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create Decision Tree classifier
+dt_model = DecisionTreeClassifier(random_state=42)
+
+# Fit the model
+dt_model.fit(X_train, y_train)
+
+# Predict
+y_pred = dt_model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1-score:", f1_score(y_test, y_pred))
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:\n", cm)
+
+# Detailed report
+print(classification_report(y_test, y_pred))
+
+# Define parameter grid
+param_grid = {
+    'max_depth': [3, 5, 7, 10, None],
+    'min_samples_split': [2, 5, 10],
+    'criterion': ['gini', 'entropy']
+}
+
+# Grid search
+grid_search = GridSearchCV(DecisionTreeClassifier(random_state=42),
+                           param_grid, cv=5, scoring='f1')
+grid_search.fit(X_train, y_train)
+
+print("Best parameters:", grid_search.best_params_)
+
+# Train best model
+best_dt = grid_search.best_estimator_
+y_pred_best = best_dt.predict(X_test)
+
+# Evaluate tuned model
+print("Tuned Accuracy:", accuracy_score(y_test, y_pred_best))
+print("Tuned F1-score:", f1_score(y_test, y_pred_best))
