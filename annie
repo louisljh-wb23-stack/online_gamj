@@ -13,6 +13,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # Hyperparameter tuning
 from sklearn.model_selection import GridSearchCV
 
+//==================================
 # Replace 'online_gaming.csv' with your dataset filename
 data = pd.read_csv('online_gaming.csv')
 
@@ -30,6 +31,7 @@ data.fillna({
     'days_since_last_login': data['days_since_last_login'].median()
 }, inplace=True)
 
+
 # 2. Encode categorical variables (gender)
 le = LabelEncoder()
 data['gender'] = le.fit_transform(data['gender'])
@@ -38,6 +40,7 @@ data['gender'] = le.fit_transform(data['gender'])
 X = data[['age', 'gender', 'play_time_hours', 'sessions_per_week',
           'in_game_purchases', 'level', 'days_since_last_login']]
 y = data['churn']  # 1 = churn, 0 = active
+//==================================       refer dataprepare文件检查看框起来的部分需要吗？有哪里需要改？
 
 # 4. Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
