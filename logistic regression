@@ -1,1 +1,370 @@
+!pip install kagglehub -q
+import kagglehub
+import pandas as pd
+import numpy as np
+import os
+# Download dataset
+path = kagglehub.dataset_download("rabieelkharoua/predict-online-gaming-behavior-dataset")
+csv_file = [f for f in os.listdir(path) if f.endswith('.csv')][0]
+data = pd.read_csv(os.path.join(path, csv_file))
+data
+
+dtuse = data.loc[:, ['SessionsPerWeek','AvgSessionDurationMinutes','EngagementLevel']] 
+dtuse.to_csv("datause.csv", index=False)
+dtuse 
+
+# Check the category distribution (is it unbalanced?)
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+X = dtuse[["SessionsPerWeek", "AvgSessionDurationMinutes"]]
+y = dtuse["EngagementLevel"]
+
+print("Class count:")
+print(y.value_counts())
+
+print("\nClass ratio:")
+print(y.value_counts(normalize=True))
+
+sns.countplot(x=y)
+plt.title("Class Distribution")
+plt.show()
+
+# Model training and evaluation
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+X = dtuse[["SessionsPerWeek", "AvgSessionDurationMinutes"]]
+y = dtuse["EngagementLevel"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y   # proportions of each category in the training and test sets the same as in the original data
+)
+# =========================
+# without class_weight
+# =========================
+pipe = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression(
+        solver="lbfgs",
+        max_iter=1000
+    ))
+])
+
+
+param_grid = {
+    "model__C": [0.01, 0.1, 1, 10, 100]
+}
+
+grid = GridSearchCV(
+    pipe,
+    param_grid,
+    cv=5,
+    scoring="f1_macro",   # Recommended for # Multi-category
+    n_jobs=-1
+)
+
+# =========================
+# model tranning
+# =========================
+grid.fit(X_train, y_train)
+
+print("\nBest Parameters:")
+print(grid.best_params_)
+
+# =========================
+# Test Set Predictions
+# =========================
+y_pred = grid.predict(X_test)
+
+print("\n=== Without class_weight ===")
+print(classification_report(y_test, y_pred))
+
+# =========================
+# with class_weight
+# =========================
+pipe_balanced = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression(
+        solver="lbfgs",
+        class_weight="balanced",  #balanced
+        max_iter=1000
+    ))
+])
+
+grid_balanced = GridSearchCV(
+    pipe_balanced,
+    param_grid,
+    cv=5,
+    scoring="f1_macro",
+    n_jobs=-1
+)
+
+grid_balanced.fit(X_train, y_train)
+
+y_pred_bal = grid_balanced.predict(X_test)
+
+print("\n=== With class_weight='balanced' ===")
+print(grid_balanced.best_params_)
+print(classification_report(y_test, y_pred_bal))
+
+# The effect of F1-score changing with C for each category
+C_values = [0.01, 0.1, 1, 10, 100]
+f1_high, f1_medium, f1_low = [], [], []
+
+for C in C_values:
+    pipe_tmp = Pipeline([
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(solver="lbfgs", max_iter=1000))
+    ])
+    pipe_tmp.set_params(model__C=C)
+    pipe_tmp.fit(X_train, y_train)
+    y_pred_tmp = pipe_tmp.predict(X_test)
+    report = classification_report(y_test, y_pred_tmp, output_dict=True)
+    f1_high.append(report["High"]["f1-score"])
+    f1_medium.append(report["Medium"]["f1-score"])
+    f1_low.append(report["Low"]["f1-score"])
+
+plt.figure(figsize=(8,5))
+plt.plot(C_values, f1_high, label="High", marker='o')
+plt.plot(C_values, f1_medium, label="Medium", marker='o')
+plt.plot(C_values, f1_low, label="Low", marker='o')
+plt.xscale('log')
+plt.xlabel("C value (log scale)")
+plt.ylabel("F1-score")
+plt.title("F1-score per class vs C value")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Examine the impact of different c values ​​on the model
+import numpy as np
+from sklearn.metrics import f1_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+# C 值列表
+C_values = list(range(1, 1001))
+f1_macro_list = []
+
+for C in C_values:
+    # 创建 pipeline
+    model = Pipeline([
+        ("scaler", StandardScaler()),
+        ("lr", LogisticRegression(solver="lbfgs", C=C, max_iter=1000))
+    ])
+    
+    # 训练
+    model.fit(X_train, y_train)
+    
+    # 预测测试集
+    y_pred = model.predict(X_test)
+    
+    # 计算 Macro F1
+    f1_macro = f1_score(y_test, y_pred, average="macro")
+    f1_macro_list.append(f1_macro)
+
+# 输出 Macro F1
+for c, f1m in zip(C_values, f1_macro_list):
+    print(f"C={c}: Macro F1={f1m:.4f}" )
+
+# 可视化
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10,6))
+plt.plot(C_values, f1_macro_list, marker='o')
+plt.xlabel("C value")
+plt.ylabel("Macro F1")
+plt.title("Macro F1 vs C (Logistic Regression)")
+plt.grid(True)
+plt.show()
+
+# Decision Boundary of Logistic Regression for User Engagement Levels
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# 编码标签
+le = LabelEncoder()
+le.fit(y_train)
+
+best_model = grid.best_estimator_
+
+# 网格
+x_min, x_max = X["SessionsPerWeek"].min() - 1, X["SessionsPerWeek"].max() + 1
+y_min, y_max = X["AvgSessionDurationMinutes"].min() - 5, X["AvgSessionDurationMinutes"].max() + 5
+
+xx, yy = np.meshgrid(
+    np.linspace(x_min, x_max, 200),
+    np.linspace(y_min, y_max, 200)
+)
+
+# 预测 + 转换
+grid_points = pd.DataFrame(
+    np.c_[xx.ravel(), yy.ravel()],
+    columns=["SessionsPerWeek", "AvgSessionDurationMinutes"]
+)
+
+Z = best_model.predict(grid_points)
+Z = le.transform(Z)
+Z = Z.reshape(xx.shape)
+
+# 测试集编码
+y_test_encoded = le.transform(y_test)
+
+# 画图
+plt.figure(figsize=(8,6))
+
+plt.contourf(xx, yy, Z, alpha=0.3, cmap="viridis")
+
+plt.scatter(
+    X_test["SessionsPerWeek"],
+    X_test["AvgSessionDurationMinutes"],
+    c=y_test_encoded,
+    cmap="viridis",
+    edgecolor="k"
+)
+
+plt.xlabel("SessionsPerWeek")
+plt.ylabel("AvgSessionDurationMinutes")
+plt.title("Logistic Regression Decision Boundary")
+
+# 画颜色条，只显示离散数字 0,1,2
+cbar = plt.colorbar(ticks=[0, 1, 2])
+cbar.set_label("Engagement Level")  
+
+plt.legend(handles=patches, title="Classes", bbox_to_anchor=(1.2, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+print(best_model)
+
+# Logistic Regression Coefficients for High / Medium / Low Engagement
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+pipe = Pipeline([
+    ("scaler", StandardScaler()),
+    ("lr", LogisticRegression(solver="lbfgs", max_iter=1000))
+])
+
+pipe.fit(X_train, y_train)
+model = pipe.named_steps['lr']
+
+# Get internal category code
+classes = model.classes_
+print("Engagement Level:", classes)
+
+coef_df = pd.DataFrame(model.coef_, columns=X_train.columns, index=classes)
+print(coef_df)
+
+coef_df.plot(kind='bar', figsize=(8,6))
+plt.title("Logistic Regression Coefficients per Engagement Level")
+plt.ylabel("Coefficient value")
+plt.xlabel("Engagement Level")
+plt.grid(axis='y')
+plt.show()
+
+# Confusion Matrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+cm = confusion_matrix(y_test, y_pred)
+
+disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                              display_labels=grid.classes_)
+
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix (Without class_weight)")
+plt.show()
+
+cm_bal = confusion_matrix(y_test, y_pred_bal)
+
+disp_bal = ConfusionMatrixDisplay(confusion_matrix=cm_bal,
+                                  display_labels=grid_balanced.classes_)
+
+disp_bal.plot(cmap="Greens")
+plt.title("Confusion Matrix (With class_weight='balanced')")
+plt.show()
+
+# Different C value vs their corresponding F1-score, Accuracy, and Log-loss for Logistic Regression
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score, log_loss
+
+C_values = [0.01, 0.1, 1, 10, 100]
+
+f1_high, f1_medium, f1_low = [], [], []
+accuracy_list, logloss_list = [], []
+
+for C in C_values:
+    pipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(solver="lbfgs", max_iter=1000))
+    ])
+    pipe.set_params(model__C=C)
+    pipe.fit(X_train, y_train)
+    
+    y_pred = pipe.predict(X_test)
+    y_prob = pipe.predict_proba(X_test)
+    
+    # F1-score per class
+    report = classification_report(y_test, y_pred, output_dict=True)
+    f1_high.append(report.get("High", {}).get("f1-score", 0))
+    f1_medium.append(report.get("Medium", {}).get("f1-score", 0))
+    f1_low.append(report.get("Low", {}).get("f1-score", 0))
+    
+    # Accuracy
+    accuracy_list.append(accuracy_score(y_test, y_pred))
+    
+    # Log-loss
+    logloss_list.append(log_loss(y_test, y_prob))
+
+# Drawing image
+fig, ax1 = plt.subplots(figsize=(10,6))
+
+# F1-score per class
+line1, = ax1.plot(C_values, f1_high, label="F1-High", marker='o', linewidth=2)
+line2, = ax1.plot(C_values, f1_medium, label="F1-Medium", marker='s', linewidth=2)
+line3, = ax1.plot(C_values, f1_low, label="F1-Low", marker='^', linewidth=2)
+
+# Accuracy
+line4, = ax1.plot(C_values, accuracy_list, label="Accuracy", marker='D', linewidth=2, linestyle='--')
+
+ax1.set_xscale('log')
+ax1.set_xlabel("C value (log scale)")
+ax1.set_ylabel("F1-score / Accuracy")
+ax1.set_title("Classification Performance vs C value")
+ax1.grid(True, linestyle='--', alpha=0.6)
+
+# Log-loss 
+ax2 = ax1.twinx()
+line5, = ax2.plot(C_values, logloss_list, label="Log-loss", marker='x', linewidth=2, linestyle=':', color='red')
+ax2.set_ylabel("Log-loss", color='red')
+ax2.tick_params(axis='y', labelcolor='red')
+
+# labels Display
+lines = [line1, line2, line3, line4, line5]
+labels = [line.get_label() for line in lines]
+ax1.legend(lines, labels, loc='upper left')
+
+plt.tight_layout()
+plt.show()
 
