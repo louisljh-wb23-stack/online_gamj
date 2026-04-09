@@ -87,3 +87,61 @@ y_pred_best = best_dt.predict(X_test)
 # Evaluate tuned model
 print("Tuned Accuracy:", accuracy_score(y_test, y_pred_best))
 print("Tuned F1-score:", f1_score(y_test, y_pred_best))
+
+//2
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
+
+# 1. Load Data
+# Ensure the CSV is in the same folder as your script
+try:
+    df = pd.read_csv('download-online_gaming_behavior_dataset.csv')
+    print("Dataset loaded successfully!")
+except FileNotFoundError:
+    print("Error: CSV file not found. Check the filename.")
+
+# 2. Preprocessing
+# Dropping PlayerID as it's just a label, not a behavior
+if 'PlayerID' in df.columns:
+    df = df.drop(columns=['PlayerID'])
+
+# Defining Target (EngagementLevel) and Features (X)
+target = 'EngagementLevel'
+X = df.drop(columns=[target])
+y = df[target]
+
+# Convert categorical variables (like Gender or GameGenre) into numbers
+X = pd.get_dummies(X, drop_first=True)
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 3. Build the Model
+# We set max_depth=3 so the visual isn't a mess of tiny boxes
+clf = DecisionTreeClassifier(max_depth=3, criterion='entropy', random_state=42)
+clf.fit(X_train, y_train)
+
+# 4. VISUALIZATION STEP
+# This part opens a window or shows the plot inline
+plt.figure(figsize=(20, 10), dpi=100) # High DPI for clarity
+
+plot_tree(clf, 
+          feature_names=X.columns.tolist(), 
+          class_names=[str(c) for c in clf.classes_], 
+          filled=True,          # Colors boxes by class
+          rounded=True,         # Rounds the corners of the boxes
+          fontsize=10, 
+          precision=2)          # Limits decimals to 2 places
+
+plt.title("Decision Tree: Online Gaming Behavior Rules")
+
+# CRITICAL: This command tells Python to actually pop up the window
+plt.show()
+
+# 5. PRINT TEXT RULES (Backup if visual is too small)
+print("\n--- Human Readable Rules ---")
+rules = export_text(clf, feature_names=list(X.columns))
+print(rules)
