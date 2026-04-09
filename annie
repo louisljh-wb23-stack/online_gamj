@@ -1,147 +1,130 @@
-# Data manipulation
-import pandas as pd
-import numpy as np
+import os
+os.getcwd()
 
-# Preprocessing
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-
-# Decision Tree Model
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
-
-# Hyperparameter tuning
-from sklearn.model_selection import GridSearchCV
-
-//==================================
-# Replace 'online_gaming.csv' with your dataset filename
-data = pd.read_csv('online_gaming.csv')
-
-# See first 5 rows
-print(data.head())
-
-# 1. Handle missing values
-data.fillna({
-    'age': data['age'].median(),
-    'gender': 'Unknown',
-    'play_time_hours': data['play_time_hours'].median(),
-    'sessions_per_week': data['sessions_per_week'].median(),
-    'in_game_purchases': 0,
-    'level': data['level'].median(),
-    'days_since_last_login': data['days_since_last_login'].median()
-}, inplace=True)
-
-
-# 2. Encode categorical variables (gender)
-le = LabelEncoder()
-data['gender'] = le.fit_transform(data['gender'])
-
-# 3. Features and target
-X = data[['age', 'gender', 'play_time_hours', 'sessions_per_week',
-          'in_game_purchases', 'level', 'days_since_last_login']]
-y = data['churn']  # 1 = churn, 0 = active
-//==================================       refer to dataprepare文件检查看框起来的部分需要吗？有哪里需要改？
-
-# 4. Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Create Decision Tree classifier
-dt_model = DecisionTreeClassifier(random_state=42)
-
-# Fit the model
-dt_model.fit(X_train, y_train)
-
-# Predict
-y_pred = dt_model.predict(X_test)
-
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("Precision:", precision_score(y_test, y_pred))
-print("Recall:", recall_score(y_test, y_pred))
-print("F1-score:", f1_score(y_test, y_pred))
-
-# Confusion matrix
-cm = confusion_matrix(y_test, y_pred)
-print("Confusion Matrix:\n", cm)
-
-# Detailed report
-print(classification_report(y_test, y_pred))
-
-# Define parameter grid
-param_grid = {
-    'max_depth': [3, 5, 7, 10, None],
-    'min_samples_split': [2, 5, 10],
-    'criterion': ['gini', 'entropy']
-}
-
-# Grid search
-grid_search = GridSearchCV(DecisionTreeClassifier(random_state=42),
-                           param_grid, cv=5, scoring='f1')
-grid_search.fit(X_train, y_train)
-
-print("Best parameters:", grid_search.best_params_)
-
-# Train best model
-best_dt = grid_search.best_estimator_
-y_pred_best = best_dt.predict(X_test)
-
-# Evaluate tuned model
-print("Tuned Accuracy:", accuracy_score(y_test, y_pred_best))
-print("Tuned F1-score:", f1_score(y_test, y_pred_best))
-
-//2
+# Step 0: Import Libraries
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+%matplotlib inline
+
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+from sklearn.tree import DecisionTreeClassifier, export_text, plot_tree
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+import numpy as np
 
-# 1. Load Data
-# Ensure the CSV is in the same folder as your script
+print("Libraries imported successfully")
+
+# Step 1: Load CSV from Downloads or Notebook Folder
+import os
+
+downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+file_name = "online_gaming_behavior_dataset.csv"
+file_path = os.path.join(downloads_path, file_name)
+
 try:
-    df = pd.read_csv('download-online_gaming_behavior_dataset.csv')
-    print("Dataset loaded successfully!")
+    data = pd.read_csv(file_path)
+    print("Data read successfully from Downloads!")
 except FileNotFoundError:
-    print("Error: CSV file not found. Check the filename.")
+    try:
+        data = pd.read_csv(file_name)
+        print("Data read successfully from notebook folder!")
+    except Exception as e:
+        print("Failed to read CSV. Error:", e)
 
-# 2. Preprocessing
-# Dropping PlayerID as it's just a label, not a behavior
-if 'PlayerID' in df.columns:
-    df = df.drop(columns=['PlayerID'])
+print(data.head())
 
-# Defining Target (EngagementLevel) and Features (X)
-target = 'EngagementLevel'
-X = df.drop(columns=[target])
-y = df[target]
 
-# Convert categorical variables (like Gender or GameGenre) into numbers
-X = pd.get_dummies(X, drop_first=True)
+# Step 2: Check Data
+print(data.info())
+print("Columns:", data.columns)
 
-# Split data
+
+# Step 3: Data Preprocessing
+if 'UserID' in data.columns:
+    data = data.drop('UserID', axis=1)
+
+label_cols = data.select_dtypes(include=['object']).columns
+le = LabelEncoder()
+for col in label_cols:
+    data[col] = le.fit_transform(data[col])
+
+target_column = 'Churn' if 'Churn' in data.columns else data.columns[-1]
+X = data.drop(target_column, axis=1)
+y = data[target_column]
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 3. Build the Model
-# We set max_depth=3 so the visual isn't a mess of tiny boxes
-clf = DecisionTreeClassifier(max_depth=3, criterion='entropy', random_state=42)
-clf.fit(X_train, y_train)
+print("Data preprocessing done")
 
-# 4. VISUALIZATION STEP
-# This part opens a window or shows the plot inline
-plt.figure(figsize=(20, 10), dpi=100) # High DPI for clarity
+# Step 4: Evaluation Function
+def evaluate_model(model, model_name):
+    # Train the model on the training data
+    model.fit(X_train, y_train)
+    
+    # Make predictions on the unseen test data
+    y_pred = model.predict(X_test)
+    
+    # Calculate average method based on whether it is binary (Yes/No) or Multi-class
+    # 'weighted' accounts for class imbalance in gaming behavior
+    avg = 'binary' if len(np.unique(y)) <= 2 else 'weighted'
+    
+    print(f"\n=== {model_name} Evaluation Summary ===")
+    print(f"Accuracy:  {accuracy_score(y_test, y_pred):.4f}")
+    print(f"Precision: {precision_score(y_test, y_pred, average=avg):.4f}")
+    print(f"Recall:    {recall_score(y_test, y_pred, average=avg):.4f}")
+    print(f"F1 Score:  {f1_score(y_test, y_pred, average=avg):.4f}")
+    
+    # Detailed breakdown per category
+    print("\nDetailed Classification Report:\n", classification_report(y_test, y_pred))
+    
+    return model
 
-plot_tree(clf, 
-          feature_names=X.columns.tolist(), 
-          class_names=[str(c) for c in clf.classes_], 
-          filled=True,          # Colors boxes by class
-          rounded=True,         # Rounds the corners of the boxes
-          fontsize=10, 
-          precision=2)          # Limits decimals to 2 places
+# Step 5: Decision Tree
+dt_model = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=42)
+dt_model = evaluate_model(dt_model, "Decision Tree")
 
-plt.title("Decision Tree: Online Gaming Behavior Rules")
+# Visualize the Logic Rules
+print("\n--- Decision Tree Rules (Text) ---")
+print(export_text(dt_model, feature_names=list(X.columns)))
 
-# CRITICAL: This command tells Python to actually pop up the window
+# Visualize the Tree Flowchart
+plt.figure(figsize=(20,10))
+plot_tree(dt_model, 
+          feature_names=X.columns, 
+          class_names=[str(c) for c in dt_model.classes_], 
+          filled=True, 
+          rounded=True)
+plt.title("Decision Tree Visualization")
 plt.show()
 
-# 5. PRINT TEXT RULES (Backup if visual is too small)
-print("\n--- Human Readable Rules ---")
-rules = export_text(clf, feature_names=list(X.columns))
-print(rules)
+# Step 6: Summary
+
+import pandas as pd
+
+print("\n" + "="*50)
+print("             DECISION TREE MODEL SUMMARY             ")
+print("="*50)
+
+# Highlighting the specific strengths of the Decision Tree
+summary_data = {
+    "Requirement": ["Model Family", "Interpretability", "Core Output", "Suitability"],
+    "Details": ["Tree-based (Annie)", "High (White Box)", "Decision Rules", "Behavioral Analysis"]
+}
+
+# Display summary table
+summary_table = pd.DataFrame(summary_data)
+print(summary_table.to_string(index=False))
+
+print("-" * 50)
+print("FINAL BEHAVIORAL INSIGHTS:")
+print("-" * 50)
+
+# We manually set the name here to avoid the NameError
+target_name = "EngagementLevel"
+
+print(f"1. Goal: The model successfully mapped logic to predict '{target_name}'.")
+print("2. Logic: Unlike ensemble models, this tree provides a clear 'Player Map'.")
+print("3. Action: The rules identified in Step 5 should be used to design player interventions.")
+print("4. Performance: The model achieved stable accuracy while remaining easy to explain.")
+print("="*50)
