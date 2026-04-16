@@ -5,7 +5,7 @@ import numpy as np
 # =========================
 # LOAD MODEL
 # =========================
-model = joblib.load("model_f.joblib")
+model = joblib.load("rf.joblib")
 
 st.title("🎮 Player Engagement Prediction App")
 
