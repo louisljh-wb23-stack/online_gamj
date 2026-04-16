@@ -15,17 +15,17 @@ st.markdown(
     """
     <style>
 
-    /* ❗ FIX SCROLL (关键) */
+    /* ❗ FIX SCROLL  */
     html, body {
         height: 100%;
         overflow: hidden;
     }
 
     .stApp {
-        height: 100vh;
+        height: 80vh;
         overflow: hidden;
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
-        background-size: 45%;
+        background-size: 90%;
         background-repeat: no-repeat;
         background-position: center;
         transition: all 1s ease-in-out;
@@ -108,7 +108,7 @@ else:
 
     st.markdown('<div class="fade-in">', unsafe_allow_html=True)
 
-    st.title("📊 Input Interface")
+    st.title("Input Interface")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
