@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 # =========================
 # INIT STATE
@@ -14,28 +15,28 @@ st.markdown(
     """
     <style>
 
-    /* REMOVE STREAMLIT DEFAULT SPACING */
+    /* REMOVE SCROLL + FIX FULL SCREEN */
+    html, body, .stApp {
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
     .block-container {
         padding-top: 0rem;
         padding-bottom: 0rem;
     }
 
-    /* LOCK FULL SCREEN */
-    html, body, .stApp {
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;   /* ❗禁止滚动 */
-    }
-
-    /* BACKGROUND TILE */
+    /* BACKGROUND IMAGE (FULL SCREEN SINGLE IMAGE) */
     .stApp {
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
-        background-repeat: repeat;
-        background-size: 180px 180px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
-    /* CENTER CONTAINER (REAL CENTER) */
+    /* CENTER CONTAINER */
     .center {
         position: absolute;
         top: 50%;
@@ -44,7 +45,7 @@ st.markdown(
         text-align: center;
     }
 
-    /* START BUTTON STYLE */
+    /* START BUTTON */
     .stButton > button {
         background: linear-gradient(45deg, #A4DE02, #8BC34A);
         color: black;
@@ -54,12 +55,31 @@ st.markdown(
         border-radius: 50px;
         border: none;
         box-shadow: 0px 12px 30px rgba(0,0,0,0.35);
-        transition: all 0.25s ease-in-out;
+        transition: all 0.3s ease-in-out;
     }
 
     .stButton > button:hover {
         transform: scale(1.08);
-        box-shadow: 0px 18px 40px rgba(0,0,0,0.45);
+    }
+
+    /* FADE IN */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    /* FADE OUT */
+    .fade-out {
+        animation: fadeOut 0.5s ease-out;
+    }
+
+    @keyframes fadeOut {
+        from {opacity: 1;}
+        to {opacity: 0;}
     }
 
     </style>
@@ -73,13 +93,16 @@ st.markdown(
 # =========================
 if not st.session_state.started:
 
-    st.markdown('<div class="center">', unsafe_allow_html=True)
+    st.markdown('<div class="center fade-in">', unsafe_allow_html=True)
 
     st.title("🎮 Game Engagement Model")
-
     st.write("Click START to begin")
 
     if st.button("START"):
+        # fade-out effect delay
+        st.markdown('<div class="fade-out">', unsafe_allow_html=True)
+        time.sleep(0.4)
+
         st.session_state.started = True
         st.rerun()
 
@@ -87,11 +110,11 @@ if not st.session_state.started:
 
 
 # =========================
-# MAIN APP
+# MAIN INPUT SCREEN
 # =========================
 else:
 
-    st.markdown('<div class="center">', unsafe_allow_html=True)
+    st.markdown('<div class="fade-in">', unsafe_allow_html=True)
 
     st.title("📊 Input Interface")
 
