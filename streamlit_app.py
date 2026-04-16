@@ -77,7 +77,7 @@ html, body {
     overflow: auto;
 }
 
-/* ❗关键：恢复 Streamlit 原生 dark background */
+/*  Streamlit dark background */
 .stApp {
     background: none !important;
 }
@@ -105,7 +105,7 @@ if not st.session_state.started:
 
     st.markdown('<div class="center">', unsafe_allow_html=True)
 
-    st.title("🎮 Welcome")
+    st.title("👾 Press Start 👾")
 
     if st.button("START"):
         time.sleep(0.2)
@@ -122,7 +122,19 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("📊 Input Interface")
+    st.title("⬛⬛⬛⬛🟨🟨🟨🟨🟨⬛⬛⬛
+⬛⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨⬛
+⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨
+⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨
+🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨⬛⬛
+🟨🟨🟨🟨🟨🟨🟨⬛⬛⬛⬛⬛
+🟨🟨🟨🟨⬛⬛⬛⬛⬛⬛⬛⬛
+🟨🟨🟨🟨🟨🟨🟨⬛⬛⬛⬛⬛
+🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨⬛⬛
+⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨
+⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨
+⬛⬛🟨🟨🟨🟨🟨🟨🟨🟨🟨⬛
+⬛⬛⬛⬛🟨🟨🟨🟨🟨⬛⬛⬛ Input Interface")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
