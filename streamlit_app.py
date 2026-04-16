@@ -1,5 +1,21 @@
 import streamlit as st
 import time
+import pandas as pd
+import joblib
+
+# =========================
+# LOAD MODEL
+# =========================
+model = joblib.load("rf.joblib")
+
+FEATURES = [
+    "Age",
+    "PlayTimeHours",
+    "SessionsPerWeek",
+    "AchievementsUnlocked",
+    "PlayerLevel",
+    "AvgSessionDurationMinutes"
+]
 
 # =========================
 # INIT STATE
@@ -40,7 +56,6 @@ header, footer {
     visibility: hidden;
 }
 
-/* center */
 .center {
     position: absolute;
     top: 50%;
@@ -49,7 +64,6 @@ header, footer {
     text-align: center;
 }
 
-/* button */
 .stButton > button {
     background: linear-gradient(45deg, #A4DE02, #8BC34A);
     color: black;
@@ -65,31 +79,13 @@ header, footer {
 
 
 # =========================
-# MAIN PAGE CSS (restore DARK THEME)
+# MAIN PAGE CSS (restore dark)
 # =========================
 main_css = """
 <style>
 
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: auto;
-}
-
-/*  Streamlit dark background */
 .stApp {
     background: none !important;
-}
-
-/* keep Streamlit default dark theme colors */
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-header, footer {
-    visibility: hidden;
 }
 
 </style>
@@ -116,23 +112,55 @@ if not st.session_state.started:
 
 
 # =========================
-# MAIN SCREEN
+# MAIN SCREEN + MODEL
 # =========================
 else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("What is your information?")
+    st.title("📊 What is your information?")
 
+    # =========================
+    # INPUTS
+    # =========================
     age = st.number_input("Age", 0, 100, 20)
+    playtime = st.number_input("Play Time Hours", 0, 1000, 10)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
+    achievements = st.number_input("Achievements Unlocked", 0, 1000, 10)
+    level = st.number_input("Player Level", 0, 100, 1)
     duration = st.number_input("Avg Session Duration", 0, 300, 30)
 
-    model = st.selectbox(
+    model_name = st.selectbox(
         "Choose Model",
-        ["KNN", "Random Forest", "Logistic Regression"]
+        ["Random Forest", "KNN", "Logistic Regression"]
     )
 
+    # =========================
+    # PREDICT BUTTON
+    # =========================
+    if st.button("Predict"):
+
+        input_data = pd.DataFrame([[
+            age,
+            playtime,
+            sessions,
+            achievements,
+            level,
+            duration
+        ]], columns=FEATURES)
+
+        prediction = model.predict(input_data)[0]
+
+        st.success(f"🎯 Predicted Engagement Level: {prediction}")
+
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(input_data)
+            st.write("Probability:")
+            st.write(proba)
+
+    # =========================
+    # BACK BUTTON
+    # =========================
     if st.button("Back"):
         st.session_state.started = False
         st.rerun()
