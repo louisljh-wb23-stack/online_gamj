@@ -1,5 +1,4 @@
 import streamlit as st
-import time
 
 # =========================
 # INIT STATE
@@ -9,82 +8,66 @@ if "started" not in st.session_state:
 
 
 # =========================
-# FADE CSS (global)
-# =========================
-st.markdown(
-    """
-    <style>
-
-    /* BACKGROUND */
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
-        background-size: 45%;
-        background-repeat: no-repeat;
-        background-position: center;
-        transition: all 1s ease-in-out;
-    }
-
-    /* hide streamlit default UI */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* fade animation */
-    .fade-in {
-        animation: fadeIn 1.2s ease-in;
-    }
-
-    @keyframes fadeIn {
-        0% {opacity: 0;}
-        100% {opacity: 1;}
-    }
-
-    /* CENTER CONTAINER */
-    .center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        flex-direction: column;
-    }
-
-    /* START BUTTON */
-    .stButton > button {
-        background: linear-gradient(45deg, #A4DE02, #8BC34A);
-        color: black;
-        padding: 18px 80px;
-        font-size: 22px;
-        font-weight: bold;
-        border-radius: 50px;
-        border: none;
-        box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-        transition: 0.3s;
-    }
-
-    .stButton > button:hover {
-        transform: scale(1.08);
-        box-shadow: 0px 12px 25px rgba(0,0,0,0.4);
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
-# =========================
 # START SCREEN
 # =========================
 if not st.session_state.started:
 
-    st.markdown('<div class="center fade-in">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <style>
 
-    st.title("🎮 Welcome")
+        /* === TILE BACKGROUND === */
+        .stApp {
+            background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
+            background-repeat: repeat;      /* 平铺 */
+            background-size: 200px 200px;   /* 每个tile大小（关键） */
+            background-position: top left;
+        }
 
-    st.write("Click start to enter the model system")
+        /* hide streamlit UI */
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
+
+        /* === FULL SCREEN CENTER === */
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;   /* 全屏垂直居中 */
+            flex-direction: column;
+        }
+
+        /* === START BUTTON === */
+        .stButton > button {
+            background: linear-gradient(45deg, #A4DE02, #8BC34A);
+            color: black;
+            padding: 20px 90px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.3);
+            transition: 0.25s;
+        }
+
+        .stButton > button:hover {
+            transform: scale(1.08);
+            box-shadow: 0px 14px 30px rgba(0,0,0,0.4);
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # CENTER CONTENT
+    st.markdown('<div class="center-container">', unsafe_allow_html=True)
+
+    st.title("🎮 Game Engagement Model")
+
+    st.write("Click start to enter system")
 
     if st.button("START"):
-        # fake fade delay
-        time.sleep(0.3)
         st.session_state.started = True
         st.rerun()
 
@@ -95,8 +78,6 @@ if not st.session_state.started:
 # MAIN APP
 # =========================
 else:
-
-    st.markdown('<div class="fade-in">', unsafe_allow_html=True)
 
     st.title("📊 Input Interface")
 
@@ -112,5 +93,3 @@ else:
     if st.button("Back"):
         st.session_state.started = False
         st.rerun()
-
-    st.markdown('</div>', unsafe_allow_html=True)
