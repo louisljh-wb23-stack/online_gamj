@@ -88,7 +88,7 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("🎮 Player Engagement Prediction (Random Forest)")
+    st.title("Tell me about you")
 
     # =========================
     # INPUT FEATURES
