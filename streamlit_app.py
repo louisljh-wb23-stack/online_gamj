@@ -4,19 +4,15 @@ import pandas as pd
 import joblib
 
 # =========================
-# LOAD MODELS
+# LOAD MODEL (ONLY RF)
 # =========================
-rf = joblib.load("rf.joblib")
-knn = joblib.load("knn.joblib")
-lr = joblib.load("lg.joblib")
-dt = joblib.load("dt.joblib")
+model = joblib.load("rf.joblib")
 
 # =========================
 # INIT STATE
 # =========================
 if "started" not in st.session_state:
     st.session_state.started = False
-
 
 # =========================
 # START PAGE CSS
@@ -56,7 +52,6 @@ html, body {
 </style>
 """
 
-
 # =========================
 # MAIN CSS
 # =========================
@@ -67,7 +62,6 @@ main_css = """
 }
 </style>
 """
-
 
 # =========================
 # START SCREEN
@@ -87,7 +81,6 @@ if not st.session_state.started:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 # =========================
 # MAIN APP
 # =========================
@@ -95,27 +88,10 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("📊 Player Engagement Prediction")
+    st.title("🎮 Player Engagement Prediction (Random Forest)")
 
     # =========================
-    # MODEL SELECT (FIXED)
-    # =========================
-    model_name = st.selectbox(
-        "Choose Model",
-        ["Random Forest", "KNN", "Logistic Regression", "Decision Tree"]
-    )
-
-    if model_name == "Random Forest":
-        model = rf
-    elif model_name == "KNN":
-        model = knn
-    elif model_name == "Logistic Regression":
-        model = lr
-    else:
-        model = dt
-
-    # =========================
-    # INPUTS
+    # INPUT FEATURES
     # =========================
     age = st.number_input("Age", 0, 100, 20)
     playtime = st.number_input("Play Time Hours", 0, 1000, 10)
@@ -149,9 +125,6 @@ else:
 
         pred = model.predict(input_data)[0]
 
-        # =========================
-        # convert label safely (if numeric model)
-        # =========================
         label_map = {
             0: "Low",
             1: "Medium",
@@ -167,6 +140,7 @@ else:
         # =========================
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(input_data)[0]
+
             st.write("Probability:")
             st.write({
                 "Low": proba[0],
@@ -175,7 +149,7 @@ else:
             })
 
     # =========================
-    # BACK
+    # BACK BUTTON
     # =========================
     if st.button("Back"):
         st.session_state.started = False
