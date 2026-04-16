@@ -22,7 +22,7 @@ st.markdown(
     }
 
     .stApp {
-        height: 80vh;
+        height: 110vh;
         overflow: hidden;
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
         background-size: 90%;
@@ -33,7 +33,7 @@ st.markdown(
 
     /* remove Streamlit default padding */
     .block-container {
-        padding-top: 0rem;
+        padding-top: 5rem;
         padding-bottom: 0rem;
         overflow: hidden;
     }
