@@ -15,36 +15,45 @@ st.markdown(
     """
     <style>
 
-    /* ❗ FIX SCROLL  */
+    /* ❗ lock full screen */
     html, body {
         height: 100%;
+        margin: 0;
+        padding: 0;
         overflow: hidden;
     }
 
     .stApp {
-        height: 110vh;
+        height: 100vh;
         overflow: hidden;
+
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
-        background-size: 90%;
+        background-size: 45%;
         background-repeat: no-repeat;
         background-position: center;
-        transition: all 1s ease-in-out;
     }
 
-    /* remove Streamlit default padding */
+    /* remove streamlit padding */
     .block-container {
-        padding-top: 5rem;
+        padding-top: 0rem;
         padding-bottom: 0rem;
-        overflow: hidden;
     }
 
-    /* hide UI */
     header {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* fade animation */
+    /* ⭐ TRUE CENTER (FIXED) */
+    .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    /* fade in */
     .fade-in {
-        animation: fadeIn 1.2s ease-in;
+        animation: fadeIn 1s ease-in;
     }
 
     @keyframes fadeIn {
@@ -52,26 +61,17 @@ st.markdown(
         to {opacity: 1;}
     }
 
-    /* CENTER */
-    .center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        flex-direction: column;
-    }
-
-    /* BUTTON */
+    /* BUTTON STYLE */
     .stButton > button {
         background: linear-gradient(45deg, #A4DE02, #8BC34A);
         color: black;
-        padding: 18px 80px;
-        font-size: 22px;
+        padding: 20px 85px;
+        font-size: 24px;
         font-weight: bold;
         border-radius: 50px;
         border: none;
-        box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-        transition: 0.3s;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
     }
 
     .stButton > button:hover {
@@ -106,9 +106,9 @@ if not st.session_state.started:
 # =========================
 else:
 
-    st.markdown('<div class="fade-in">', unsafe_allow_html=True)
+    st.markdown('<div class="center fade-in">', unsafe_allow_html=True)
 
-    st.title("Input Interface")
+    st.title("📊 Input Interface")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
