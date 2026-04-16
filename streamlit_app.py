@@ -122,7 +122,7 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("K I Y I")
+    st.title("What is your information?")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
