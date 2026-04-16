@@ -15,7 +15,7 @@ if not st.session_state.started:
     page_bg = """
     <style>
     .stApp {
-        background-image: url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d");
+        background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
         background-size: cover;
         background-position: center;
     }
