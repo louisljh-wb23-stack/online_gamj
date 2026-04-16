@@ -1,38 +1,75 @@
 import streamlit as st
-import joblib
-import numpy as np
 
 # =========================
-# LOAD MODEL
+# init state
 # =========================
-model = joblib.load("rf.joblib")
-
-st.title("🎮 Player Engagement Prediction App")
-
-st.write("Enter player behavior data to predict engagement level.")
+if "started" not in st.session_state:
+    st.session_state.started = False
 
 # =========================
-# INPUT FEATURES
+# START SCREEN
 # =========================
-age = st.number_input("Age", min_value=0, max_value=100, value=20)
-play_time = st.number_input("Play Time Hours", min_value=0.0, value=5.0)
-sessions = st.number_input("Sessions Per Week", min_value=0, value=3)
-achievements = st.number_input("Achievements Unlocked", min_value=0, value=10)
-player_level = st.number_input("Player Level", min_value=0, value=1)
-avg_session = st.number_input("Avg Session Duration (minutes)", min_value=0.0, value=30.0)
+if not st.session_state.started:
+
+    # -------- BACKGROUND IMAGE --------
+    page_bg = """
+    <style>
+    .stApp {
+        background-image: url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d");
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* hide default streamlit elements */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+    """
+    st.markdown(page_bg, unsafe_allow_html=True)
+
+    # -------- CENTER BUTTON --------
+    st.markdown(
+        """
+        <style>
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            flex-direction: column;
+        }
+
+        .start-btn {
+            background-color: white;
+            padding: 15px 50px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="center-container">', unsafe_allow_html=True)
+
+    if st.button("START"):
+        st.session_state.started = True
+        st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
-# PREDICTION
+# MAIN APP
 # =========================
-if st.button("Predict Engagement Level"):
-    
-    X = np.array([[age,
-                   play_time,
-                   sessions,
-                   achievements,
-                   player_level,
-                   avg_session]])
+else:
+    st.title("Input Interface")
 
-    prediction = model.predict(X)[0]
+    age = st.number_input("Age")
+    sessions = st.number_input("Sessions per Week")
 
-    st.success(f"Predicted Engagement Level: {prediction}")
+    if st.button("Back to Start"):
+        st.session_state.started = False
+        st.rerun()
