@@ -105,7 +105,7 @@ if not st.session_state.started:
 
     st.markdown('<div class="center">', unsafe_allow_html=True)
 
-    st.title("👾 Press Start 👾")
+    st.title("👾 Press Start")
 
     if st.button("START"):
         time.sleep(0.2)
