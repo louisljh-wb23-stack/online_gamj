@@ -9,7 +9,7 @@ if "started" not in st.session_state:
 
 
 # =========================
-# START PAGE CSS (with background)
+# START PAGE CSS (unicorn background)
 # =========================
 start_css = """
 <style>
@@ -40,7 +40,7 @@ header, footer {
     visibility: hidden;
 }
 
-/* CENTER */
+/* center */
 .center {
     position: absolute;
     top: 50%;
@@ -49,7 +49,7 @@ header, footer {
     text-align: center;
 }
 
-/* BUTTON */
+/* button */
 .stButton > button {
     background: linear-gradient(45deg, #A4DE02, #8BC34A);
     color: black;
@@ -65,7 +65,7 @@ header, footer {
 
 
 # =========================
-# MAIN PAGE CSS (NO BACKGROUND RESET)
+# MAIN PAGE CSS (restore DARK THEME)
 # =========================
 main_css = """
 <style>
@@ -77,12 +77,12 @@ html, body {
     overflow: auto;
 }
 
-/* RESET BACKGROUND */
+/* ❗关键：恢复 Streamlit 原生 dark background */
 .stApp {
-    background-image: none !important;
-    background-color: white !important;
+    background: none !important;
 }
 
+/* keep Streamlit default dark theme colors */
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -122,7 +122,7 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("Input Interface")
+    st.title("📊 Input Interface")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
