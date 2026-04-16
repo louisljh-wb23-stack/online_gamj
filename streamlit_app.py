@@ -4,18 +4,12 @@ import pandas as pd
 import joblib
 
 # =========================
-# LOAD MODEL
+# LOAD MODELS
 # =========================
-model = joblib.load("rf.joblib")
-
-FEATURES = [
-    "Age",
-    "PlayTimeHours",
-    "SessionsPerWeek",
-    "AchievementsUnlocked",
-    "PlayerLevel",
-    "AvgSessionDurationMinutes"
-]
+rf = joblib.load("rf.joblib")
+knn = joblib.load("knn.joblib")
+lr = joblib.load("lg.joblib")
+dt = joblib.load("dt.joblib")
 
 # =========================
 # INIT STATE
@@ -25,7 +19,7 @@ if "started" not in st.session_state:
 
 
 # =========================
-# START PAGE CSS (unicorn background)
+# START PAGE CSS
 # =========================
 start_css = """
 <style>
@@ -33,27 +27,14 @@ start_css = """
 html, body {
     height: 100%;
     margin: 0;
-    padding: 0;
     overflow: hidden;
 }
 
 .stApp {
-    height: 100vh;
-    overflow: hidden;
-
     background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
     background-size: 45%;
     background-repeat: no-repeat;
     background-position: center;
-}
-
-.block-container {
-    padding-top: 0rem;
-    padding-bottom: 0rem;
-}
-
-header, footer {
-    visibility: hidden;
 }
 
 .center {
@@ -69,9 +50,7 @@ header, footer {
     color: black;
     padding: 20px 85px;
     font-size: 24px;
-    font-weight: bold;
     border-radius: 50px;
-    border: none;
 }
 
 </style>
@@ -79,15 +58,13 @@ header, footer {
 
 
 # =========================
-# MAIN PAGE CSS (restore dark)
+# MAIN CSS
 # =========================
 main_css = """
 <style>
-
 .stApp {
     background: none !important;
 }
-
 </style>
 """
 
@@ -112,13 +89,30 @@ if not st.session_state.started:
 
 
 # =========================
-# MAIN SCREEN + MODEL
+# MAIN APP
 # =========================
 else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("📊 What is your information?")
+    st.title("📊 Player Engagement Prediction")
+
+    # =========================
+    # MODEL SELECT (FIXED)
+    # =========================
+    model_name = st.selectbox(
+        "Choose Model",
+        ["Random Forest", "KNN", "Logistic Regression", "Decision Tree"]
+    )
+
+    if model_name == "Random Forest":
+        model = rf
+    elif model_name == "KNN":
+        model = knn
+    elif model_name == "Logistic Regression":
+        model = lr
+    else:
+        model = dt
 
     # =========================
     # INPUTS
@@ -130,13 +124,17 @@ else:
     level = st.number_input("Player Level", 0, 100, 1)
     duration = st.number_input("Avg Session Duration", 0, 300, 30)
 
-    model_name = st.selectbox(
-        "Choose Model",
-        ["Random Forest", "KNN", "Logistic Regression"]
-    )
+    FEATURES = [
+        "Age",
+        "PlayTimeHours",
+        "SessionsPerWeek",
+        "AchievementsUnlocked",
+        "PlayerLevel",
+        "AvgSessionDurationMinutes"
+    ]
 
     # =========================
-    # PREDICT BUTTON
+    # PREDICT
     # =========================
     if st.button("Predict"):
 
@@ -149,17 +147,35 @@ else:
             duration
         ]], columns=FEATURES)
 
-        prediction = model.predict(input_data)[0]
+        pred = model.predict(input_data)[0]
 
-        st.success(f"🎯 Predicted Engagement Level: {prediction}")
+        # =========================
+        # convert label safely (if numeric model)
+        # =========================
+        label_map = {
+            0: "Low",
+            1: "Medium",
+            2: "High"
+        }
 
+        label = label_map.get(pred, pred)
+
+        st.success(f"🎯 Prediction: {label}")
+
+        # =========================
+        # PROBABILITY
+        # =========================
         if hasattr(model, "predict_proba"):
-            proba = model.predict_proba(input_data)
+            proba = model.predict_proba(input_data)[0]
             st.write("Probability:")
-            st.write(proba)
+            st.write({
+                "Low": proba[0],
+                "Medium": proba[1],
+                "High": proba[2]
+            })
 
     # =========================
-    # BACK BUTTON
+    # BACK
     # =========================
     if st.button("Back"):
         st.session_state.started = False
