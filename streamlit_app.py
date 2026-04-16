@@ -19,7 +19,7 @@ st.title("KNN Decision Boundary (PCA vs LDA)")
 # =========================
 # LOAD DATA (建议用本地CSV)
 # =========================
-df = pd.read_csv("your_dataset.csv")  # ← 改成你的文件
+df = pd.read_csv("online_gaming_behavior_dataset.csv")  
 
 # =========================
 # FEATURES & TARGET
