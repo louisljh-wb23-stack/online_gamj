@@ -1,5 +1,4 @@
 import streamlit as st
-import time
 
 # =========================
 # INIT STATE
@@ -9,13 +8,13 @@ if "started" not in st.session_state:
 
 
 # =========================
-# GLOBAL CSS
+# CSS
 # =========================
 st.markdown(
     """
     <style>
 
-    /* REMOVE SCROLL + FIX FULL SCREEN */
+    /* FULL SCREEN FIX */
     html, body, .stApp {
         height: 100vh;
         margin: 0;
@@ -28,18 +27,25 @@ st.markdown(
         padding-bottom: 0rem;
     }
 
-    /* BACKGROUND IMAGE (FULL SCREEN SINGLE IMAGE) */
+    /* BACKGROUND IMAGE + FADE IN */
     .stApp {
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+
+        animation: bgFadeIn 1.2s ease-in;
     }
 
-    /* CENTER CONTAINER */
+    @keyframes bgFadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    /* CENTER CONTAINER (slightly lower) */
     .center {
         position: absolute;
-        top: 50%;
+        top: 58%;   /* ↓ 往下移一点 */
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -62,7 +68,7 @@ st.markdown(
         transform: scale(1.08);
     }
 
-    /* FADE IN */
+    /* FADE IN FOR MAIN PAGE */
     .fade-in {
         animation: fadeIn 0.8s ease-in;
     }
@@ -70,16 +76,6 @@ st.markdown(
     @keyframes fadeIn {
         from {opacity: 0;}
         to {opacity: 1;}
-    }
-
-    /* FADE OUT */
-    .fade-out {
-        animation: fadeOut 0.5s ease-out;
-    }
-
-    @keyframes fadeOut {
-        from {opacity: 1;}
-        to {opacity: 0;}
     }
 
     </style>
@@ -95,14 +91,7 @@ if not st.session_state.started:
 
     st.markdown('<div class="center fade-in">', unsafe_allow_html=True)
 
-    st.title("🎮 Game Engagement Model")
-    st.write("Click START to begin")
-
     if st.button("START"):
-        # fade-out effect delay
-        st.markdown('<div class="fade-out">', unsafe_allow_html=True)
-        time.sleep(0.4)
-
         st.session_state.started = True
         st.rerun()
 
@@ -110,13 +99,13 @@ if not st.session_state.started:
 
 
 # =========================
-# MAIN INPUT SCREEN
+# MAIN SCREEN
 # =========================
 else:
 
     st.markdown('<div class="fade-in">', unsafe_allow_html=True)
 
-    st.title("📊 Input Interface")
+    st.title("Input Interface")
 
     age = st.number_input("Age", 0, 100, 20)
     sessions = st.number_input("Sessions Per Week", 0, 50, 5)
@@ -127,7 +116,7 @@ else:
         ["KNN", "Random Forest", "Logistic Regression"]
     )
 
-    if st.button("Back to Start"):
+    if st.button("Back"):
         st.session_state.started = False
         st.rerun()
 
