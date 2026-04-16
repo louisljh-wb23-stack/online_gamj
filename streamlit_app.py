@@ -9,14 +9,21 @@ if "started" not in st.session_state:
 
 
 # =========================
-# FADE CSS (global)
+# CSS
 # =========================
 st.markdown(
     """
     <style>
 
-    /* BACKGROUND */
+    /* ❗ FIX SCROLL (关键) */
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
     .stApp {
+        height: 100vh;
+        overflow: hidden;
         background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
         background-size: 45%;
         background-repeat: no-repeat;
@@ -24,7 +31,14 @@ st.markdown(
         transition: all 1s ease-in-out;
     }
 
-    /* hide streamlit default UI */
+    /* remove Streamlit default padding */
+    .block-container {
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+        overflow: hidden;
+    }
+
+    /* hide UI */
     header {visibility: hidden;}
     footer {visibility: hidden;}
 
@@ -34,11 +48,11 @@ st.markdown(
     }
 
     @keyframes fadeIn {
-        0% {opacity: 0;}
-        100% {opacity: 1;}
+        from {opacity: 0;}
+        to {opacity: 1;}
     }
 
-    /* CENTER CONTAINER */
+    /* CENTER */
     .center {
         display: flex;
         justify-content: center;
@@ -47,7 +61,7 @@ st.markdown(
         flex-direction: column;
     }
 
-    /* START BUTTON */
+    /* BUTTON */
     .stButton > button {
         background: linear-gradient(45deg, #A4DE02, #8BC34A);
         color: black;
@@ -62,7 +76,6 @@ st.markdown(
 
     .stButton > button:hover {
         transform: scale(1.08);
-        box-shadow: 0px 12px 25px rgba(0,0,0,0.4);
     }
 
     </style>
@@ -80,10 +93,7 @@ if not st.session_state.started:
 
     st.title("🎮 Welcome")
 
-    st.write("Click start to enter the model system")
-
     if st.button("START"):
-        # fake fade delay
         time.sleep(0.3)
         st.session_state.started = True
         st.rerun()
