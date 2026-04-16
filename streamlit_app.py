@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 # =========================
 # INIT STATE
@@ -8,60 +9,82 @@ if "started" not in st.session_state:
 
 
 # =========================
+# FADE CSS (global)
+# =========================
+st.markdown(
+    """
+    <style>
+
+    /* BACKGROUND */
+    .stApp {
+        background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
+        background-size: 45%;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: all 1s ease-in-out;
+    }
+
+    /* hide streamlit default UI */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* fade animation */
+    .fade-in {
+        animation: fadeIn 1.2s ease-in;
+    }
+
+    @keyframes fadeIn {
+        0% {opacity: 0;}
+        100% {opacity: 1;}
+    }
+
+    /* CENTER CONTAINER */
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        flex-direction: column;
+    }
+
+    /* START BUTTON */
+    .stButton > button {
+        background: linear-gradient(45deg, #A4DE02, #8BC34A);
+        color: black;
+        padding: 18px 80px;
+        font-size: 22px;
+        font-weight: bold;
+        border-radius: 50px;
+        border: none;
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+        transition: 0.3s;
+    }
+
+    .stButton > button:hover {
+        transform: scale(1.08);
+        box-shadow: 0px 12px 25px rgba(0,0,0,0.4);
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# =========================
 # START SCREEN
 # =========================
 if not st.session_state.started:
 
-    st.markdown(
-        """
-        <style>
-        /* background */
-        .stApp {
-            background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
-            background-size: cover;
-            background-position: center;
-        }
+    st.markdown('<div class="center fade-in">', unsafe_allow_html=True)
 
-        /* hide streamlit UI */
-        header {visibility: hidden;}
-        footer {visibility: hidden;}
+    st.title("🎮 Welcome")
 
-        /* center container */
-        .center-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-            flex-direction: column;
-        }
-
-        /* streamlit button style */
-        .stButton > button {
-            background-color: #A4DE02;   /* 黄绿色 */
-            color: black;
-            padding: 18px 70px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 40px;
-            border: none;
-            box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
-            transition: all 0.25s ease-in-out;
-        }
-
-        .stButton > button:hover {
-            background-color: #8BC34A;
-            transform: scale(1.08);
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown('<div class="center-container">', unsafe_allow_html=True)
-
-    st.title("")
+    st.write("Click start to enter the model system")
 
     if st.button("START"):
+        # fake fade delay
+        time.sleep(0.3)
         st.session_state.started = True
         st.rerun()
 
@@ -73,21 +96,21 @@ if not st.session_state.started:
 # =========================
 else:
 
-    st.title("🎮 Player Engagement Input Interface")
+    st.markdown('<div class="fade-in">', unsafe_allow_html=True)
 
-    st.write("Enter player data below:")
+    st.title("📊 Input Interface")
 
-    age = st.number_input("Age", min_value=0, max_value=100, value=20)
-    sessions = st.number_input("Sessions Per Week", min_value=0)
-    duration = st.number_input("Avg Session Duration (min)", min_value=0)
+    age = st.number_input("Age", 0, 100, 20)
+    sessions = st.number_input("Sessions Per Week", 0, 50, 5)
+    duration = st.number_input("Avg Session Duration", 0, 300, 30)
 
     model = st.selectbox(
         "Choose Model",
         ["KNN", "Random Forest", "Logistic Regression"]
     )
 
-    st.write("Selected Model:", model)
-
-    if st.button("Back to Start"):
+    if st.button("Back"):
         st.session_state.started = False
         st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
