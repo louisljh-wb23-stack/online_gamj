@@ -4,7 +4,7 @@ import pandas as pd
 import joblib
 
 # =========================
-# LOAD MODEL (ONLY RF)
+# LOAD MODEL (Random Forest only)
 # =========================
 model = joblib.load("rf.joblib")
 
@@ -47,6 +47,7 @@ html, body {
     padding: 20px 85px;
     font-size: 24px;
     border-radius: 50px;
+    border: none;
 }
 
 </style>
@@ -88,17 +89,17 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("Tell me about you")
+    st.title("🎮 Player Engagement Prediction (Random Forest)")
 
     # =========================
-    # INPUT FEATURES
+    # INPUT FEATURES (5-digit limit)
     # =========================
-    age = st.number_input("Age", 0, 100, 20)
-    playtime = st.number_input("Play Time Hours", 0, 1000, 10)
-    sessions = st.number_input("Sessions Per Week", 0, 50, 5)
-    achievements = st.number_input("Achievements Unlocked", 0, 1000, 10)
-    level = st.number_input("Player Level", 0, 100, 1)
-    duration = st.number_input("Avg Session Duration", 0, 300, 30)
+    age = st.number_input("Age", 0, 99999, 20, step=1)
+    playtime = st.number_input("Play Time Hours", 0, 99999, 10, step=1)
+    sessions = st.number_input("Sessions Per Week", 0, 99999, 5, step=1)
+    achievements = st.number_input("Achievements Unlocked", 0, 99999, 10, step=1)
+    level = st.number_input("Player Level", 0, 99999, 1, step=1)
+    duration = st.number_input("Avg Session Duration", 0, 99999, 30, step=1)
 
     FEATURES = [
         "Age",
