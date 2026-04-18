@@ -153,3 +153,38 @@ else:
     if st.button("Back"):
         st.session_state.started = False
         st.rerun()
+
+
+# =========================
+# MODEL VISUALIZATION IMAGES (SIDEBAR)
+# =========================
+st.sidebar.markdown("---")
+st.sidebar.subheader("📊 Model Visualizations")
+
+image_map = {
+    "Logistic Regression": [
+        "lg_cm.png",
+        "lg_cm_norm.png",
+        "lg_roc.png"
+    ],
+    "KNN": [
+        "knn_cm.png",
+        "knn_cm_norm.png",
+        "knn_roc.png"
+    ],
+    "Decision Tree": [
+        "dt_cm.png",
+        "dt_cm_norm.png",
+        "dt_roc.png"
+    ],
+    "Random Forest": [
+        "rf_cm.png",
+        "rf_cm_norm.png",
+        "rf_roc.png"
+    ],
+}
+
+images = image_map.get(model_name, [])
+
+for img in images:
+    st.sidebar.image(img)
