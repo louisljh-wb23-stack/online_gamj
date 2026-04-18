@@ -9,7 +9,7 @@ models = {
     "Logistic Regression": joblib.load("lg.joblib"),
     "KNN": joblib.load("knn.joblib"),
     "Decision Tree": joblib.load("dt.joblib"),
-    "Random Forest": joblib.load("rf.joblib"),
+    "Random Forest": joblib.load("rf2.joblib"),
 }
 
 # =========================
