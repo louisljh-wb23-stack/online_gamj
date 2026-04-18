@@ -178,9 +178,10 @@ image_map = {
         "dt_roc.png"
     ],
     "Random Forest": [
-        "rf_cm.png",
-        "rf_cm_norm.png",
-        "rf_roc.png"
+        "Permutation test.png",
+        "Mean F1 CV score.png",
+        "Confution Matrix.png",
+        "RF performance"
     ],
 }
 # =========================
