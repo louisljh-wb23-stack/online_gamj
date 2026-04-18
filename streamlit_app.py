@@ -173,7 +173,7 @@ image_map = {
     "Random Forest": [
         "ran/Permutation test.png",
         "ran/Mean F1 CV score.png",
-        "ran/Confusion Matrix.png",
+        "ran/Confution Matrix.png",
         "ran/RF performance.png"
     ],
     "Decision Tree": [
