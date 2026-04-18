@@ -1,10 +1,9 @@
 import streamlit as st
-import time
 import pandas as pd
 import joblib
 
 # =========================
-# LOAD MODEL (Random Forest only)
+# LOAD MODEL
 # =========================
 model = joblib.load("rf.joblib")
 
@@ -76,7 +75,6 @@ if not st.session_state.started:
     st.title("👾 Press Start")
 
     if st.button("START"):
-        time.sleep(0.2)
         st.session_state.started = True
         st.rerun()
 
@@ -89,42 +87,34 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("Tell me about you")
+    st.title("🎮 Tell me about you")
 
     # =========================
-    # INPUT FEATURES (5-digit limit)
+    # INPUT FEATURES
     # =========================
     age = st.number_input("Age", 0, 99999, 20, step=1)
     playtime = st.number_input("Play Time Hours", 0, 99999, 10, step=1)
     sessions = st.number_input("Sessions Per Week", 0, 99999, 5, step=1)
     achievements = st.number_input("Achievements Unlocked", 0, 99999, 10, step=1)
     level = st.number_input("Player Level", 0, 99999, 1, step=1)
-    duration = st.number_input("Avg Session Duration", 0, 99999, 30, step=1)
-
-    FEATURES = [
-        "Age",
-        "PlayTimeHours",
-        "SessionsPerWeek",
-        "AchievementsUnlocked",
-        "PlayerLevel",
-        "AvgSessionDurationMinutes"
-    ]
+    duration = st.number_input("Avg Session Duration (Minutes)", 0, 99999, 30, step=1)
 
     # =========================
     # PREDICT
     # =========================
     if st.button("Predict"):
 
-        input_data = pd.DataFrame([[
-            age,
-            playtime,
-            sessions,
-            achievements,
-            level,
-            duration
-        ]], columns=FEATURES)
+        input_data = pd.DataFrame([{
+            "Age": age,
+            "PlayTimeHours": playtime,
+            "SessionsPerWeek": sessions,
+            "AchievementsUnlocked": achievements,
+            "PlayerLevel": level,
+            "AvgSessionDurationMinutes": duration
+        }])
 
-        pred = model.predict(input_data)[0]
+        with st.spinner("Predicting..."):
+            pred = model.predict(input_data)[0]
 
         label_map = {
             0: "Low",
@@ -132,22 +122,21 @@ else:
             2: "High"
         }
 
-        label = label_map.get(pred, pred)
+        label = label_map.get(pred, str(pred))
 
         st.success(f"🎯 Prediction: {label}")
 
         # =========================
-        # PROBABILITY
+        # PROBABILITY (SAFE VERSION)
         # =========================
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(input_data)[0]
 
-            st.write("Probability:")
-            st.write({
-                "Low": proba[0],
-                "Medium": proba[1],
-                "High": proba[2]
-            })
+            classes = model.classes_
+            proba_dict = dict(zip(classes, proba))
+
+            st.write("📊 Probability:")
+            st.write(proba_dict)
 
     # =========================
     # BACK BUTTON
