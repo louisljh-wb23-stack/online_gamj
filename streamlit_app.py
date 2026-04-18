@@ -36,7 +36,7 @@ if "model_name" not in st.session_state:
 # =========================
 # SIDEBAR
 # =========================
-st.sidebar.title("⚙️ Model Selection")
+st.sidebar.title("Model Selection")
 
 model_name = st.sidebar.selectbox(
     "Choose Model",
@@ -158,8 +158,8 @@ else:
 # =========================
 # MODEL VISUALIZATION IMAGES (SIDEBAR)
 # =========================
-st.sidebar.markdown("---")
-st.sidebar.subheader("📊 Model Visualizations")
+#st.sidebar.markdown("---")
+#st.sidebar.subheader("Model Visualizations")
 
 image_map = {
     "Logistic Regression": [
@@ -196,7 +196,7 @@ image_map = {
 # RESULT IMAGE SIDEBAR
 # =========================
 st.sidebar.markdown("---")
-st.sidebar.subheader("📊 Result Preview")
+st.sidebar.subheader("Result Preview")
 
 st.sidebar.image("result.png")
 
