@@ -3,35 +3,64 @@ import pandas as pd
 import joblib
 
 # =========================
-# LOAD MODEL
+# LOAD MODELS
 # =========================
-model = joblib.load("rf.joblib")
+models = {
+    "Logistic Regression": joblib.load("lg.joblib"),
+    "KNN": joblib.load("knn.joblib"),
+    "Decision Tree": joblib.load("dt.joblib"),
+    "Random Forest": joblib.load("rf.joblib"),
+}
 
 # =========================
-# INIT STATE
+# COMMON FEATURES 
+# =========================
+FEATURES = [
+    "Age",
+    "PlayTimeHours",
+    "SessionsPerWeek",
+    "AchievementsUnlocked",
+    "PlayerLevel",
+    "AvgSessionDurationMinutes"
+]
+
+# =========================
+# SESSION STATE
 # =========================
 if "started" not in st.session_state:
     st.session_state.started = False
 
+if "model_name" not in st.session_state:
+    st.session_state.model_name = "Random Forest"
+
 # =========================
-# START PAGE CSS
+# SIDEBAR MODEL SELECT
+# =========================
+st.sidebar.title("⚙️ Model Selection")
+
+model_name = st.sidebar.selectbox(
+    "Choose Model",
+    list(models.keys()),
+    index=list(models.keys()).index(st.session_state.model_name)
+)
+
+st.session_state.model_name = model_name
+model = models[model_name]
+
+st.sidebar.markdown("---")
+st.sidebar.success(f"Current model:\n{model_name}")
+
+# =========================
+# START SCREEN CSS
 # =========================
 start_css = """
 <style>
-
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-}
-
 .stApp {
     background-image: url("https://raw.githubusercontent.com/louisljh-wb23-stack/online_gamj/326d080c022ad5d8648e064b01dda026c446aba9/unicorn.png");
     background-size: 45%;
     background-repeat: no-repeat;
     background-position: center;
 }
-
 .center {
     position: absolute;
     top: 50%;
@@ -39,37 +68,21 @@ html, body {
     transform: translate(-50%, -50%);
     text-align: center;
 }
-
-.stButton > button {
-    background: linear-gradient(45deg, #A4DE02, #8BC34A);
-    color: black;
-    padding: 20px 85px;
-    font-size: 24px;
-    border-radius: 50px;
-    border: none;
-}
-
 </style>
 """
 
-# =========================
-# MAIN CSS
-# =========================
 main_css = """
 <style>
-.stApp {
-    background: none !important;
-}
+.stApp { background: none !important; }
 </style>
 """
 
 # =========================
-# START SCREEN
+# START PAGE
 # =========================
 if not st.session_state.started:
 
     st.markdown(start_css, unsafe_allow_html=True)
-
     st.markdown('<div class="center">', unsafe_allow_html=True)
 
     st.title("👾 Press Start")
@@ -87,17 +100,17 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title("🎮 Tell me about you")
+    st.title(f"🎮 Player Engagement Predictor")
 
     # =========================
-    # INPUT FEATURES
+    # INPUTS (统一 features)
     # =========================
-    age = st.number_input("Age", 0, 99999, 20, step=1)
-    playtime = st.number_input("Play Time Hours", 0, 99999, 10, step=1)
-    sessions = st.number_input("Sessions Per Week", 0, 99999, 5, step=1)
-    achievements = st.number_input("Achievements Unlocked", 0, 99999, 10, step=1)
-    level = st.number_input("Player Level", 0, 99999, 1, step=1)
-    duration = st.number_input("Avg Session Duration (Minutes)", 0, 99999, 30, step=1)
+    age = st.number_input("Age", 0, 99999, 20)
+    playtime = st.number_input("Play Time Hours", 0, 99999, 10)
+    sessions = st.number_input("Sessions Per Week", 0, 99999, 5)
+    achievements = st.number_input("Achievements Unlocked", 0, 99999, 10)
+    level = st.number_input("Player Level", 0, 99999, 1)
+    duration = st.number_input("Avg Session Duration (Minutes)", 0, 99999, 30)
 
     # =========================
     # PREDICT
@@ -113,33 +126,26 @@ else:
             "AvgSessionDurationMinutes": duration
         }])
 
-        with st.spinner("Predicting..."):
+        with st.spinner(f"Running {model_name}..."):
             pred = model.predict(input_data)[0]
 
-        label_map = {
-            0: "Low",
-            1: "Medium",
-            2: "High"
-        }
-
+        label_map = {0: "Low", 1: "Medium", 2: "High"}
         label = label_map.get(pred, str(pred))
 
-        st.success(f"🎯 Prediction: {label}")
+        st.success(f"🎯 Prediction ({model_name}): {label}")
 
         # =========================
-        # PROBABILITY (SAFE VERSION)
+        # PROBABILITY
         # =========================
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(input_data)[0]
-
             classes = model.classes_
-            proba_dict = dict(zip(classes, proba))
 
             st.write("📊 Probability:")
-            st.write(proba_dict)
+            st.write(dict(zip(classes, proba)))
 
     # =========================
-    # BACK BUTTON
+    # BACK
     # =========================
     if st.button("Back"):
         st.session_state.started = False
