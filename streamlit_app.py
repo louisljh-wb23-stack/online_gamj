@@ -163,12 +163,12 @@ st.sidebar.subheader("📊 Model Visualizations")
 
 image_map = {
     "Logistic Regression": [
-        "ran/Coefficients per EngagementLevel.png",
-        "ran/Decision Boundary.png",
-        "ran/Confusion Matrix.png",
-        "ran/Mni-batch.png",
-        "ran/Training Performance.png",
-        "ran/LG performance.png"
+        "log/Coefficients per EngagementLevel.png",
+        "log/Decision Boundary.png",
+        "log/Confusion Matrix.png",
+        "log/Mni-batch.png",
+        "log/Training Performance.png",
+        "log/LG performance.png"
     ],
     "Random Forest": [
         "ran/Permutation test.png",
@@ -177,19 +177,19 @@ image_map = {
         "ran/RF performance.png"
     ],
     "Decision Tree": [
-        "ran/Permutation test.png",
-        "ran/Mean F1 CV score.png",
-        "ran/Confusion Matrix.png",
-        "ran/DT performance.png"
+        "des/Permutation test.png",
+        "des/Mean F1 CV score.png",
+        "des/Confusion Matrix.png",
+        "des/DT performance.png"
     ],
     "KNN": [
-        "ran/KNN performance.png",
-        "ran/Decision Boundary.png",
-        "ran/PCA and LCA.png",
-        "ran/Confusion Matrix.png",
-        "ran/KNN performance.png",
-        "ran/K and hyperparameters.png",
-        "ran/K vs Accuracy.png"
+        "knn/KNN performance.png",
+        "knn/Decision Boundary.png",
+        "knn/PCA and LCA.png",
+        "knn/Confusion Matrix.png",
+        "knn/KNN performance.png",
+        "knn/K and hyperparameters.png",
+        "knn/K vs Accuracy.png"
     ],
 }
 # =========================
