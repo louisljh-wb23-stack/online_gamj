@@ -183,6 +183,13 @@ image_map = {
         "rf_roc.png"
     ],
 }
+# =========================
+# RESULT IMAGE SIDEBAR
+# =========================
+st.sidebar.markdown("---")
+st.sidebar.subheader("📊 Result Preview")
+
+st.sidebar.image("result.jpg")
 
 images = image_map.get(model_name, [])
 
