@@ -6,7 +6,7 @@ import joblib
 # LOAD MODELS
 # =========================
 models = {
-    "Logistic Regression": joblib.load("lg.joblib"),
+    "Logistic Regression": joblib.load("lg2.joblib"),
     "KNN": joblib.load("knn.joblib"),
     "Decision Tree": joblib.load("dt.joblib"),
     "Random Forest": joblib.load("rf.joblib"),
