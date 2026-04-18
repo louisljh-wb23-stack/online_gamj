@@ -190,7 +190,7 @@ image_map = {
 st.sidebar.markdown("---")
 st.sidebar.subheader("📊 Result Preview")
 
-st.sidebar.image("result.jpg")
+st.sidebar.image("result.png")
 
 images = image_map.get(model_name, [])
 
