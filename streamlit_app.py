@@ -153,39 +153,3 @@ else:
     if st.button("Back"):
         st.session_state.started = False
         st.rerun()
-
-
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
-
-st.markdown("---")
-st.subheader("📊 Confusion Matrix (Full Model)")
-
-if st.button("Generate Confusion Matrix"):
-
-    # =========================
-    # FULL MODEL CM
-    # =========================
-    cm_full = confusion_matrix(y, y_pred_full)
-
-    fig1, ax1 = plt.subplots()
-    disp_full = ConfusionMatrixDisplay(confusion_matrix=cm_full)
-    disp_full.plot(cmap="Blues", ax=ax1)
-
-    ax1.set_title("Confusion Matrix - FULL MODEL")
-
-    st.pyplot(fig1)
-
-    # =========================
-    # NORMALIZED CM
-    # =========================
-    cm_full_norm = cm_full.astype("float") / cm_full.sum(axis=1)[:, None]
-
-    fig2, ax2 = plt.subplots()
-    disp_full_norm = ConfusionMatrixDisplay(confusion_matrix=cm_full_norm)
-
-    disp_full_norm.plot(cmap="Blues", values_format=".2f", ax=ax2)
-
-    ax2.set_title("Normalized Confusion Matrix - FULL MODEL")
-
-    st.pyplot(fig2)
