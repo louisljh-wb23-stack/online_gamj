@@ -178,18 +178,18 @@ image_map = {
     ],
     "Decision Tree": [
         "des/Permutation test.png",
-        "des/Mean F1 CV score.png",
+        "des/Mean F1 CV Score.png",
         "des/Confusion Matrix.png",
         "des/DT performance.png"
     ],
     "KNN": [
         "knn/KNN performance.png",
-        "knn/Decision Boundary.png",
-        "knn/PCA and LCA.png",
-        "knn/Confusion Matrix.png",
-        "knn/KNN performance.png",
+        "knn/Mean F1 CV score.png",
         "knn/K and hyperparameters.png",
-        "knn/K vs Accuracy.png"
+        "knn/K vs Accuracy.png",
+        "knn/KNN performance.png",
+        "knn/Mean F1 CV score.png",
+        "knn/PCA and LCA.png"
     ],
 }
 # =========================
