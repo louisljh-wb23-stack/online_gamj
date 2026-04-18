@@ -6,14 +6,14 @@ import joblib
 # LOAD MODELS
 # =========================
 models = {
-    "Logistic Regression": joblib.load("lg.joblib"),
+    "Logistic Regression": joblib.load("logistic.joblib"),
     "KNN": joblib.load("knn.joblib"),
     "Decision Tree": joblib.load("dt.joblib"),
     "Random Forest": joblib.load("rf2.joblib"),
 }
 
 # =========================
-# COMMON FEATURES 
+# COMMON FEATURES
 # =========================
 FEATURES = [
     "Age",
@@ -34,7 +34,7 @@ if "model_name" not in st.session_state:
     st.session_state.model_name = "Random Forest"
 
 # =========================
-# SIDEBAR MODEL SELECT
+# SIDEBAR
 # =========================
 st.sidebar.title("⚙️ Model Selection")
 
@@ -100,10 +100,10 @@ else:
 
     st.markdown(main_css, unsafe_allow_html=True)
 
-    st.title(f"🎮 Player Engagement Predictor")
+    st.title(f"🎮 Player Engagement Predictor ({model_name})")
 
     # =========================
-    # INPUTS (统一 features)
+    # INPUTS
     # =========================
     age = st.number_input("Age", 0, 99999, 20)
     playtime = st.number_input("Play Time Hours", 0, 99999, 10)
@@ -113,18 +113,21 @@ else:
     duration = st.number_input("Avg Session Duration (Minutes)", 0, 99999, 30)
 
     # =========================
+    # INPUT DATAFRAME
+    # =========================
+    input_data = pd.DataFrame([{
+        "Age": age,
+        "PlayTimeHours": playtime,
+        "SessionsPerWeek": sessions,
+        "AchievementsUnlocked": achievements,
+        "PlayerLevel": level,
+        "AvgSessionDurationMinutes": duration
+    }])
+
+    # =========================
     # PREDICT
     # =========================
     if st.button("Predict"):
-
-        input_data = pd.DataFrame([{
-            "Age": age,
-            "PlayTimeHours": playtime,
-            "SessionsPerWeek": sessions,
-            "AchievementsUnlocked": achievements,
-            "PlayerLevel": level,
-            "AvgSessionDurationMinutes": duration
-        }])
 
         with st.spinner(f"Running {model_name}..."):
             pred = model.predict(input_data)[0]
@@ -132,7 +135,7 @@ else:
         label_map = {0: "Low", 1: "Medium", 2: "High"}
         label = label_map.get(pred, str(pred))
 
-        st.success(f"🎯 Prediction ({model_name}): {label}")
+        st.success(f"🎯 Prediction: {label}")
 
         # =========================
         # PROBABILITY
